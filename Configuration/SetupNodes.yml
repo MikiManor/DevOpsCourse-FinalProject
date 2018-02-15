@@ -1,0 +1,68 @@
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  
+  vars:
+      ec2_region: eu-central-1
+      machines: [ 'Jenkins Server', 'Build Node', 'Target Node']
+  tasks:
+
+    - name: Provision a Set of 4 instances
+      ec2:
+        key_name: SshKey
+        group: "LAN-Security Group"
+        instance_type: t2.micro
+        aws_access_key: "{{ ec2_access_key }}"
+        aws_secret_key: "{{ ec2_secret_key }}"
+        region: "{{ ec2_region }}"
+        image: ami-194cdc76
+        wait: true
+        exact_count: 1
+        instance_tags: 
+           Name: "{{ item }}"
+           VPCName: "LAN"
+        count_tag:
+           Name: "{{ item }}"
+        vpc_subnet_id: subnet-3a189077
+        assign_public_ip: yes
+      register: ec2
+      with_items: "{{ machines }}"
+
+    - debug: msg="IP="{{ item.tagged_instances.0.public_ip }}""
+      with_items: "{{ ec2.results }}"
+      
+
+
+    - name: Add Public IPs to host group
+      add_host: 
+        hostname: "{{ item.tagged_instances.0.public_ip }}" 
+        groupname: FinalProjectServers
+      with_items: "{{ ec2.results }}"
+
+- hosts: FinalProjectServers
+  name: Config Them
+  user: ec2-user
+  gather_facts: true  
+  vars:
+      ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
+  tasks:
+    - name: Install NTP Service
+      become: yes
+      yum: name=ntp state=installed
+      notify:
+        - start ntpd
+
+    - name: Start ntpd service
+      become: yes
+      service: name=ntpd state=started
+
+
+  handlers:
+    - name: start ntpd
+      become: yes
+      service: name=ntpd state=restarted
+
+
+
+
+
