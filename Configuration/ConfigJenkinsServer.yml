@@ -1,9 +1,0 @@
-- name: Configure CI server
-  hosts: JenkinsNode
-  sudo: True
-  roles:
-    - git
-    - geerlingguy.jenkins
-    - ntp
-
-

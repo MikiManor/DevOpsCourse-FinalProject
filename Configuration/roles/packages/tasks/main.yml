@@ -1,0 +1,6 @@
+---
+- name: Install container selinux for docker
+  yum:
+    name: http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm
+    state: present
+

@@ -4,7 +4,7 @@
   
   vars:
       ec2_region: eu-central-1
-      machines: [ 'Jenkins Server', 'Build Node', 'Target Node']
+      machines: [ 'JenkinsServer', 'BuildNode', 'TargetNode']
   tasks:
 
     - name: Provision a Set of 3 instances
@@ -12,8 +12,6 @@
         key_name: SshKey
         group: "LAN-Security Group"
         instance_type: t2.micro
-        #aws_access_key: "{{ ec2_access_key }}"
-        #aws_secret_key: "{{ ec2_secret_key }}"
         region: "{{ ec2_region }}"
         image: ami-194cdc76
         wait: true
@@ -28,39 +26,44 @@
       register: ec2
       with_items: "{{ machines }}"
 
-    - debug: msg="IP="{{ item.tagged_instances.0.public_ip }}""
-      with_items: "{{ ec2.results }}"
+    #- debug: msg="DEBUG="{{ item.tagged_instances.0.tags.Name}}""
+    #  with_items: "{{ ec2.results }}"
       
 
 
     - name: Add Public IPs to host group
       add_host: 
-        hostname: "{{ item.tagged_instances.0.public_ip }}" 
+        hostname: "{{ item.tagged_instances.0.tags.Name }}" 
+        ansible_host: "{{ item.tagged_instances.0.private_ip }}"
+        ansible_user: ec2-user
         groupname: FinalProjectServers
       with_items: "{{ ec2.results }}"
 
-- hosts: FinalProjectServers
-  name: Config Them
-  user: ec2-user
-  gather_facts: true  
+
+
+- name: Configure CI server
+  hosts: JenkinsServer
+  become: True
+  gather_facts: true
   vars:
       ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
-  tasks:
-    - name: Install NTP Service
-      become: yes
-      yum: name=ntp state=installed
-      notify:
-        - start ntpd
-
-    - name: Start ntpd service
-      become: yes
-      service: name=ntpd state=started
+  roles:
+    - geerlingguy.jenkins
+    - ntp
 
 
-  handlers:
-    - name: start ntpd
-      become: yes
-      service: name=ntpd state=restarted
+- name: Configure Build Node
+  hosts: BuildNode
+  become: True
+  gather_facts: true
+  vars:
+      ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
+  roles:
+    - geerlingguy.java
+    - ntp
+    - git
+    - packages
+    - geerlingguy.docker
 
 
 
