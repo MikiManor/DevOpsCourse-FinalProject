@@ -47,10 +47,27 @@
   gather_facts: true
   vars:
       ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
+      userName: jenkins
   roles:
     - geerlingguy.jenkins
     - ntp
 
+  tasks:
+    - name: Create .ssh folder
+      file:
+        path: "~{{ userName }}/.ssh"
+        state: directory
+        owner: "{{ userName }}"
+        group: "{{ userName }}"
+        mode: 0700
+
+    - name: Upload pem file
+      copy:
+       src: ~/.ssh/SshKey.pem
+       dest: "~{{ userName }}/.ssh/SshKey.pem"
+       owner: "{{ userName }}"
+       group: "{{ userName }}"
+       mode: 0700
 
 - name: Configure Build Node
   hosts: BuildNode
@@ -58,6 +75,7 @@
   gather_facts: true
   vars:
       ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
+      userName: jenkins
   roles:
     - geerlingguy.java
     - ntp
@@ -65,7 +83,48 @@
     - packages
     - geerlingguy.docker
 
+  tasks:
+    - name: Add jenkins user to jenkins slave
+      user:
+        name: "{{ userName }}"
+        password: 
+        groups: 
+        state: present
+        shell: /bin/bash       
+        system: no
+        generate_ssh_key: yes           
+        createhome: yes    
+        home: "/home/{{ userName }}"
+
+    - name: Create .ssh folder
+      file:
+        path: "~{{ userName }}/.ssh"
+        state: directory
+        owner: "{{ userName }}"
+        group: "{{ userName }}"
+        mode: 0700
+
+    - name: Upload authorized_keys file
+      copy:
+       src: ~/.ssh/authorized_keys
+       dest: "~{{ userName }}/.ssh/authorized_keys"
+       owner: "{{ userName }}"
+       group: "{{ userName }}"
+       mode: 0700
 
 
 
+
+
+- name: Configure Target Node
+  hosts: TargetNode
+  become: True
+  gather_facts: true
+  vars:
+      ansible_ssh_private_key_file: ~/.ssh/SshKey.pem
+  roles:
+    - ntp
+    - packages
+    - geerlingguy.docker
+    - python
 
