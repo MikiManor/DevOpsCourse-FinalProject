@@ -1,0 +1,34 @@
+    
+    - name: use java role
+      include_role:
+        name: geerlingguy.java
+
+    - name: Add jenkins user to jenkins slave
+      user:
+        name: "{{ userName }}"
+        password:
+        groups:
+          - docker
+        state: present
+        shell: /bin/bash
+        system: no
+        generate_ssh_key: yes
+        createhome: yes
+        home: "/home/{{ userName }}"
+
+    - name: Create .ssh folder
+      file:
+        path: "~{{ userName }}/.ssh"
+        state: directory
+        owner: "{{ userName }}"
+        group: "{{ userName }}"
+        mode: 0700
+
+    - name: Upload authorized_keys file
+      copy:
+       src: ~/.ssh/authorized_keys
+       dest: "~{{ userName }}/.ssh/authorized_keys"
+       owner: "{{ userName }}"
+       group: "{{ userName }}"
+       mode: 0700
+
