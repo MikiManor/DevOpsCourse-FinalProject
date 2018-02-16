@@ -1,7 +1,12 @@
-    
+   
     - name: use java role
       include_role:
         name: geerlingguy.java
+
+    - name: use git role
+      include_role:
+        name: git
+
 
     - name: Add jenkins user to jenkins slave
       user:
