@@ -1,0 +1,12 @@
+stage('Build') {
+   build 'build'
+}
+stage('Package') {
+   build 'package'
+   }
+stage('Deploy') {
+   build 'deploy'
+}
+stage('Test') {
+   build 'test'
+}
