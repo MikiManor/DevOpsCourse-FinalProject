@@ -1,0 +1,4 @@
+# use a tomcat alpine base image
+FROM tomcat:alpine
+
+COPY build.war /usr/local/tomcat/webapps/
