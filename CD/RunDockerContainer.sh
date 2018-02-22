@@ -10,7 +10,7 @@ if [  "$(docker ps -q -f name=${containerName})" ]; then
     fi
 fi
 # run your container
-docker run -d --name ${containerName} -p 80:8080 -dt ${containerName}:${containerTag}
+docker run -d --name ${containerName} -p 80:8080 -dt ${containerTag}
 
 
 
