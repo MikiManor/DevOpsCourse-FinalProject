@@ -6,7 +6,7 @@ pureName=`cut -d "/" -f2 <<< ${containerName}`
 
 if [  "$(docker ps -q -f name=${containerName})" ]; then
     docker stop ${containerName}
-    if [ "$(docker ps -aq -f status=exited -f name=${containerName})" ]; then
+    if [ "$(docker ps -aq -f status=exited -f name=${pureName})" ]; then
         # cleanup
         docker rm ${containerName}
     fi
