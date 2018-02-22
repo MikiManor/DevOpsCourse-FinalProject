@@ -1,3 +1,4 @@
+#!/bin/bash -x
 
 containerName=$1
 containerTag=$2
