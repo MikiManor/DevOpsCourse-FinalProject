@@ -8,7 +8,7 @@ if [  "$(docker ps -q -f name=${pureName})" ]; then
     docker stop ${pureName}
     if [ "$(docker ps -aq -f status=exited -f name=${pureName})" ]; then
         # cleanup
-        docker rm ${containerName}
+        docker rm ${pureName}
     fi
 fi
 # run your container
