@@ -4,7 +4,7 @@ containerName=$1
 containerTag=$2
 pureName=`cut -d "/" -f2 <<< ${containerName}`
 
-if [  "$(docker ps -q -f name=${containerName})" ]; then
+if [  "$(docker ps -q -f name=${pureName})" ]; then
     docker stop ${containerName}
     if [ "$(docker ps -aq -f status=exited -f name=${pureName})" ]; then
         # cleanup
