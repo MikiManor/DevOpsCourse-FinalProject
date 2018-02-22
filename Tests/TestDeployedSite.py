@@ -1,7 +1,7 @@
 import requests
 
 r = requests.get('http://18.195.21.198/build/').content
-if r in "Welcome to Devops":
+if "HTTP Status 404" not in r:
     print "All Good"
 else:
     print "No reponose!"
