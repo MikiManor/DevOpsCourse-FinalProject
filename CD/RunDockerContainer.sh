@@ -8,8 +8,9 @@ if [  "$(docker ps -q -f name=${containerName})" ]; then
         # cleanup
         docker rm ${containerName}
     fi
-    # run your container
-    docker run -d --name ${containerName} -p 80:8080 -dt ${containerName}:${containerTag}
 fi
+# run your container
+docker run -d --name ${containerName} -p 80:8080 -dt ${containerName}:${containerTag}
+
 
 
