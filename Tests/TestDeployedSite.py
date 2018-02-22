@@ -1,6 +1,6 @@
 import requests
 
-r = requests.get('http://18.195.21.198/build/').content
+r = requests.get('http://18.195.21.198/builad/').content
 if "HTTP Status 404" not in r:
     print "All Good"
 else:
