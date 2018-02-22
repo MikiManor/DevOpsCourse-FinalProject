@@ -2,7 +2,7 @@
 
 containerName=$1
 containerTag=$2
-pureName=cut -d "/" -f2 <<< ${containerName}
+pureName='cut -d "/" -f2 <<< ${containerName}'
 
 if [  "$(docker ps -q -f name=${containerName})" ]; then
     docker stop ${containerName}
